@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio Kreatif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Variabel Palet Warna: Spektrum Abu-abu (Menghindari Hitam & Putih Murni) */
+        :root {
+            --bg-color: #2b2b2b;       /* Abu-abu gelap untuk background */
+            --surface-color: #3d3d3d;  /* Abu-abu medium untuk kartu/elemen */
+            --text-main: #d9d9d9;      /* Abu-abu terang untuk teks utama */
+            --text-muted: #a6a6a6;     /* Abu-abu redup untuk teks sekunder */
+            --accent: #8c8c8c;         /* Abu-abu netral untuk aksen */
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+        }
+
+        /* Layout & Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigasi */
+        nav {
+            padding: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80vh;
+            gap: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s forwards ease-out;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-content p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        /* Image Placeholder */
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .image-placeholder {
+            width: 350px;
+            height: 450px;
+            background-color: var(--surface-color);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-placeholder:hover {
+            transform: translateY(-10px);
+        }
+
+        /* Jika Anda sudah punya gambar, elemen img ini akan menimpa placeholder */
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block; /* Ubah ke block setelah gambar ditambahkan */
+        }
+
+        /* Bagian Portofolio/Proyek */
+        .portfolio {
+            padding: 5rem 0;
+        }
+
+        .portfolio h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            padding: 2.5rem;
+            border-radius: 16px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0; /* Untuk animasi scroll JS */
+            transform: translateY(30px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsif untuk HP */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                min-height: auto;
+                padding-top: 2rem;
+            }
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .image-placeholder {
+                width: 100%;
+                max-width: 300px;
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="logo">Portofolio.</div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1 id="typewriter"></h1>
+                <p>
+                    Halo. Saya seorang kreator independen yang berdomisili di Jawa Barat. Sebagai seorang INFP, saya memiliki ketertarikan mendalam pada eksplorasi imajinasi—baik melalui seni visual, jalinan narasi yang kompleks, maupun logika komputasi. Saya menuangkan ide-ide saya ke dalam berbagai medium untuk menciptakan sesuatu yang bermakna.
+                </p>
+            </div>
+            
+            <div class="hero-image">
+                <div class="image-placeholder">
+                    [ Area Gambar Profil ]
+                    <img src="thumb.jpeg" alt="Foto Profil" id="myImage">
+                </div>
+            </div>
+        </section>
+
+        <section class="portfolio">
+            <h2>Fokus Kreatif</h2>
+            <div class="grid">
+                
+                <div class="card reveal">
+                    <h3>Ilustrasi Digital</h3>
+                    <p>Mengeksplorasi seni visual dengan gaya seni yang terinspirasi dari manhwa dan webtoon Korea modern. Berfokus pada detail karakter, atmosfer, dan ekspresi emosional yang kuat.</p>
+                </div>
+
+                <div class="card reveal">
+                    <h3>Zayyan Revandra</h3>
+                    <p>Sebuah proyek penulisan naratif dengan struktur plot yang mendalam. Berpusat pada drama karakter, trauma masa lalu, dan misteri yang dikemas dengan kejutan cerita (plot twist) berlapis.</p>
+                </div>
+
+                <div class="card reveal">
+                    <h3>BookOfPrograms</h3>
+                    <p>Pengembangan add-on edukasi interaktif. Proyek ini dirancang untuk mengajarkan logika pemrograman melalui command block dasar (mencakup 11% command fundamental) dan pengenalan JSON.</p>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- 1. Efek Mengetik (Typewriter Effect) pada Judul ---
+        const text = "Membangun Dunia Melalui Seni, Cerita & Kode.";
+        const speed = 60; // Kecepatan mengetik dalam milidetik
+        let i = 0;
+        
+        function typeWriter() {
+            if (i < text.length) {
+                document.getElementById("typewriter").innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, speed);
+            }
+        }
+        
+        // Memulai efek ketik saat halaman dimuat
+        window.onload = typeWriter;
+
+        // --- 2. Animasi Scroll Reveal untuk Kartu Portofolio ---
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+
+            for (var j = 0; j < reveals.length; j++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[j].getBoundingClientRect().top;
+                var elementVisible = 100; // Jarak dari bawah layar sebelum elemen muncul
+
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[j].style.opacity = "1";
+                    reveals[j].style.transform = "translateY(0)";
+                }
+            }
+        }
+
+        // Mengecek scroll setiap kali pengguna menggulir halaman
+        window.addEventListener("scroll", reveal);
+        
+        // Memicu pengecekan sekali saat halaman pertama kali dimuat
+        reveal();
+    </script>
+</body>
+</html>
