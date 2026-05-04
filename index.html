@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Gaming Services</title>
+
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="YOUR_MIDTRANS_CLIENT_KEY"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg:       #0d0d10;
+            --surface:  #13131a;
+            --panel:    #18181f;
+            --border:   rgba(255,255,255,0.07);
+            --accent:   #c4b0ff;
+            --accent2:  #8b6fff;
+            --glow:     rgba(139,111,255,0.25);
+            --muted:    #5e5e78;
+            --text:     #ededf5;
+            --sub:      #8888a8;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        /* noise grain */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        /* ══════════════════════════
+           SCROLL REVEAL
+        ══════════════════════════ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1),
+                        transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ══════════════════════════
+           NAVBAR
+        ══════════════════════════ */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 64px;
+            height: 70px;
+            background: rgba(13,13,16,0.82);
+            position: fixed;
+            width: 100%; top: 0; z-index: 1000;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow 0.4s;
+            animation: navDrop 0.6s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes navDrop {
+            from { opacity:0; transform: translateY(-100%); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        nav.scrolled { box-shadow: 0 8px 48px rgba(0,0,0,0.55); }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+
+        .nav-links { list-style: none; display: flex; gap: 4px; align-items: center; }
+
+        .nav-links li a {
+            position: relative;
+            color: var(--sub);
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            padding: 6px 14px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav-links li a:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+        .nav-links li a.active { color: var(--accent); }
+
+        /* underline indicator */
+        .nav-links li a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 2px;
+            background: var(--accent2);
+            border-radius: 2px;
+        }
+
+        .btn-login {
+            background: transparent;
+            border: 1px solid rgba(196,176,255,0.3);
+            color: var(--accent);
+            padding: 7px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.84rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            margin-left: 12px;
+        }
+        .btn-login:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        /* ══════════════════════════
+           HERO
+        ══════════════════════════ */
+        header {
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+            padding: 100px 24px 80px;
+            position: relative; overflow: hidden;
+        }
+
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(100px); pointer-events: none;
+        }
+        .orb-1 {
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(139,111,255,0.15) 0%, transparent 70%);
+            top: -200px; left: -200px;
+            animation: drift 12s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(196,176,255,0.1) 0%, transparent 70%);
+            bottom: -100px; right: -80px;
+            animation: drift 16s ease-in-out infinite alternate-reverse;
+        }
+        .orb-3 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(100,160,255,0.07) 0%, transparent 70%);
+            top: 40%; left: 60%;
+            animation: drift 9s ease-in-out infinite alternate;
+        }
+        @keyframes drift {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(50px, 40px) scale(1.05); }
+        }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--accent);
+            border: 1px solid rgba(196,176,255,0.25);
+            padding: 7px 18px; border-radius: 100px;
+            margin-bottom: 32px;
+            animation: heroUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.1s both;
+            background: rgba(139,111,255,0.06);
+        }
+        .hero-badge::before {
+            content: '';
+            display: block; width: 6px; height: 6px;
+            border-radius: 50%; background: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity:1; transform: scale(1); }
+            50%      { opacity:0.5; transform: scale(0.7); }
+        }
+
+        header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 7.5vw, 5.8rem);
+            font-weight: 800;
+            line-height: 1.06;
+            letter-spacing: -0.025em;
+            max-width: 900px;
+            animation: heroUp 1s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+        }
+        header h1 em {
+            font-style: normal;
+            background: linear-gradient(130deg, var(--accent) 0%, var(--accent2) 55%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        header p {
+            margin-top: 28px;
+            font-size: 1.05rem;
+            color: var(--sub);
+            max-width: 480px;
+            animation: heroUp 1s cubic-bezier(0.16,1,0.3,1) 0.32s both;
+        }
+
+        .hero-cta {
+            margin-top: 48px;
+            display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+            animation: heroUp 1s cubic-bezier(0.16,1,0.3,1) 0.44s both;
+        }
+
+        @keyframes heroUp {
+            from { opacity:0; transform: translateY(28px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            padding: 14px 38px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: #fff; text-decoration: none;
+            font-weight: 600; font-size: 0.9rem;
+            border-radius: 8px; border: none; cursor: pointer;
+            letter-spacing: 0.03em;
+            box-shadow: 0 0 48px rgba(139,111,255,0.4);
+            transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); box-shadow: 0 0 60px rgba(139,111,255,0.55); }
+
+        .btn-ghost {
+            padding: 14px 38px;
+            background: transparent; color: var(--sub); text-decoration: none;
+            font-weight: 500; font-size: 0.9rem;
+            border-radius: 8px; border: 1px solid var(--border);
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+        /* stats row */
+        .hero-stats {
+            display: flex; gap: 48px; margin-top: 72px;
+            animation: heroUp 1s cubic-bezier(0.16,1,0.3,1) 0.56s both;
+            border-top: 1px solid var(--border);
+            padding-top: 36px;
+        }
+        .stat { text-align: center; }
+        .stat-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.9rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
+
+        /* scroll line */
+        .scroll-hint {
+            position: absolute; bottom: 32px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            opacity: 0.35;
+            animation: heroUp 1s ease 1s both;
+        }
+        .scroll-hint span { font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sub); }
+        .scroll-bar { width: 1px; height: 44px; background: linear-gradient(to bottom, var(--sub), transparent); animation: scrollBounce 2s ease-in-out infinite; }
+        @keyframes scrollBounce {
+            0%,100% { transform: scaleY(1); opacity: 0.4; }
+            50%      { transform: scaleY(1.15); opacity: 1; }
+        }
+
+        /* ══════════════════════════
+           SECTION BASE
+        ══════════════════════════ */
+        .section-wrap { padding: 112px 64px; max-width: 1200px; margin: 0 auto; }
+
+        .eyebrow {
+            font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 14px;
+        }
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800; line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 52px;
+        }
+
+        /* ══════════════════════════
+           TAB MENU
+        ══════════════════════════ */
+        .tab-bar {
+            display: flex; gap: 4px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            display: flex; align-items: center; gap: 7px;
+            padding: 10px 22px;
+            background: transparent; border: none;
+            color: var(--sub);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.87rem; font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s, background 0.2s;
+            position: relative;
+            border-radius: 8px 8px 0 0;
+        }
+        .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+        .tab-btn.active { color: var(--accent); }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute; bottom: -1px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent2), var(--accent));
+            border-radius: 2px 2px 0 0;
+            animation: tabLine 0.3s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes tabLine {
+            from { opacity:0; transform: scaleX(0.3); }
+            to   { opacity:1; transform: scaleX(1); }
+        }
+        .tab-icon { font-size: 0.95rem; }
+
+        .tab-panel { display: none; }
+        .tab-panel.active {
+            display: block;
+            animation: panelIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        @keyframes panelIn {
+            from { opacity:0; transform: translateY(14px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        /* service cards */
+        .services-grid { display: flex; flex-direction: column; gap: 14px; }
+
+        .service-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px 36px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative; overflow: hidden;
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            gap: 0 24px;
+            align-items: center;
+        }
+        .service-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 0% 50%, rgba(139,111,255,0.07) 0%, transparent 55%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .service-card:hover::before { opacity: 1; }
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 56px rgba(0,0,0,0.5);
+            border-color: rgba(196,176,255,0.18);
+        }
+
+        .card-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: rgba(139,111,255,0.1);
+            border: 1px solid rgba(139,111,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .card-body h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem; font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .card-body p { color: var(--sub); font-size: 0.88rem; line-height: 1.55; }
+
+        .card-right {
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 10px;
+            flex-shrink: 0;
+        }
+        .card-price {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.15rem; font-weight: 700;
+            color: var(--accent); white-space: nowrap;
+        }
+        .card-order-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(139,111,255,0.1);
+            border: 1px solid rgba(139,111,255,0.22);
+            color: var(--accent);
+            padding: 7px 16px; border-radius: 7px;
+            font-size: 0.78rem; font-weight: 600;
+            letter-spacing: 0.04em;
+            transition: background 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+        .service-card:hover .card-order-btn {
+            background: rgba(139,111,255,0.2);
+            box-shadow: 0 0 16px rgba(139,111,255,0.25);
+        }
+
+        /* ══════════════════════════
+           ABOUT
+        ══════════════════════════ */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 56px; align-items: start;
+        }
+        .about-sidebar { position: sticky; top: 90px; }
+
+        .avatar-box {
+            aspect-ratio: 1;
+            border-radius: 22px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5rem;
+            margin-bottom: 20px;
+            position: relative; overflow: hidden;
+        }
+        .avatar-box::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(139,111,255,0.1) 0%, transparent 60%);
+        }
+
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+        .skill-tag {
+            font-size: 0.74rem; font-weight: 500;
+            padding: 4px 11px; border-radius: 100px;
+            background: var(--panel); border: 1px solid var(--border);
+            color: var(--sub); letter-spacing: 0.03em;
+        }
+
+        .about-body p { color: var(--sub); font-size: 0.97rem; margin-bottom: 20px; }
+        .about-body p:last-child { margin-bottom: 0; }
+        .about-body em { color: var(--accent); font-style: italic; }
+
+        /* ══════════════════════════
+           DIVIDER & FOOTER
+        ══════════════════════════ */
+        .divider { width: 100%; height: 1px; background: var(--border); }
+
+        footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 32px 64px;
+            border-top: 1px solid var(--border);
+        }
+        .footer-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; letter-spacing: 0.18em; font-size: 1rem;
+        }
+        .footer-logo span { color: var(--accent); }
+        footer p { color: var(--muted); font-size: 0.8rem; }
+
+img {
+    max-width: 100%;  /* Biar gambar nggak melebihi lebar layar (responsive) */
+    height: auto;     /* Biar rasio gambar tetep terjaga, nggak gepeng */
+    border-radius: 10px; /* Bikin pojokan gambar jadi tumpul */
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.2); /* Kasih efek bayangan */
+}
+
+
+        /* ══════════════════════════
+           MODAL
+        ══════════════════════════ */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.78);
+            z-index: 2000;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+        .modal-overlay.show { display: flex; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 48px 40px;
+            border-radius: 22px;
+            width: 100%; max-width: 420px;
+            position: relative;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06);
+            animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(30px) scale(0.97); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+
+        .close-btn {
+            position: absolute; top: 18px; right: 18px;
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--panel); border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; color: var(--muted);
+            cursor: pointer; transition: color 0.2s, background 0.2s; line-height: 1;
+        }
+        .close-btn:hover { color: var(--text); background: #222232; }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.4rem; font-weight: 800;
+            text-align: center; margin-bottom: 32px; letter-spacing: -0.01em;
+        }
+
+        .input-group { margin-bottom: 14px; }
+        .input-group label {
+            display: block; margin-bottom: 6px;
+            color: var(--sub); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.04em;
+        }
+        .input-group input {
+            width: 100%; padding: 11px 14px;
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text);
+            font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-group input:focus {
+            border-color: rgba(196,176,255,0.45);
+            box-shadow: 0 0 0 3px rgba(139,111,255,0.12);
+        }
+        .input-group input[readonly] { background: rgba(255,255,255,0.02); color: var(--muted); cursor: not-allowed; }
+
+        .btn-submit {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: #fff; border: none; border-radius: 8px;
+            font-family: 'DM Sans', sans-serif; font-weight: 600;
+            cursor: pointer; font-size: 0.92rem; margin-top: 10px;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 24px rgba(139,111,255,0.3);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-submit:hover { opacity: 0.87; transform: translateY(-1px); }
+        .btn-submit:disabled { opacity: 0.38; cursor: wait; transform: none; }
+
+        .toggle-form { text-align: center; margin-top: 20px; font-size: 0.84rem; color: var(--muted); }
+        .toggle-form span { color: var(--accent); cursor: pointer; font-weight: 600; }
+        .toggle-form span:hover { text-decoration: underline; }
+
+        #register-form { display: none; }
+
+        /* ── Responsive ── */
+        /* ══════════════════════════
+           TESTIMONI
+        ══════════════════════════ */
+        .testi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 16px;
+        }
+
+        .testi-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 26px 22px;
+            display: flex; flex-direction: column; gap: 14px;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .testi-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 100% 0%, rgba(139,111,255,0.07) 0%, transparent 55%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .testi-card:hover::before { opacity: 1; }
+        .testi-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(196,176,255,0.16);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .testi-quote {
+            font-size: 2.2rem; line-height: 1;
+            color: var(--accent2); opacity: 0.4;
+            font-family: Georgia, serif; user-select: none;
+        }
+
+        .testi-stars { display: flex; gap: 3px; color: #f5c542; font-size: 0.82rem; }
+
+        .testi-text {
+            color: var(--text); font-size: 0.92rem;
+            line-height: 1.72; font-style: italic; flex: 1;
+        }
+
+        .testi-footer {
+            display: flex; align-items: center; gap: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 16px; margin-top: 2px;
+        }
+
+        .testi-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(139,111,255,0.12);
+            border: 1px solid rgba(139,111,255,0.22);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+
+        .testi-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.87rem; font-weight: 700; color: var(--text);
+        }
+        .testi-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
+        .testi-badge {
+            margin-left: auto;
+            font-size: 0.67rem; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--accent);
+            background: rgba(139,111,255,0.1);
+            border: 1px solid rgba(139,111,255,0.2);
+            padding: 3px 9px; border-radius: 100px; white-space: nowrap;
+        }
+
+        /* ══════════════════════════
+           MASUKAN FORM
+        ══════════════════════════ */
+        .masukan-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 52px; align-items: start;
+        }
+
+        .masukan-info h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.35rem; font-weight: 800;
+            margin-bottom: 14px; line-height: 1.25;
+        }
+        .masukan-info > p {
+            color: var(--sub); font-size: 0.92rem;
+            line-height: 1.7; margin-bottom: 32px;
+        }
+
+        .contact-items { display: flex; flex-direction: column; gap: 12px; }
+        .contact-item {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 0.87rem; color: var(--sub);
+        }
+        .contact-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: rgba(139,111,255,0.1);
+            border: 1px solid rgba(139,111,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+
+        .masukan-form-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px; padding: 34px 30px;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .form-group { margin-bottom: 13px; }
+        .form-group label {
+            display: block; margin-bottom: 6px;
+            color: var(--sub); font-size: 0.79rem;
+            font-weight: 500; letter-spacing: 0.04em;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%; padding: 10px 13px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text);
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group textarea { resize: vertical; min-height: 108px; line-height: 1.6; }
+        .form-group select { cursor: pointer; }
+        .form-group select option { background: var(--surface); }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: rgba(196,176,255,0.45);
+            box-shadow: 0 0 0 3px rgba(139,111,255,0.1);
+        }
+
+        /* star rating */
+        .rating-group { margin-bottom: 13px; }
+        .rating-group > label {
+            display: block; margin-bottom: 8px;
+            color: var(--sub); font-size: 0.79rem;
+            font-weight: 500; letter-spacing: 0.04em;
+        }
+        .star-picker { display: flex; gap: 4px; flex-direction: row-reverse; justify-content: flex-end; }
+        .star-picker input { display: none; }
+        .star-picker label {
+            font-size: 1.45rem; cursor: pointer; color: var(--muted);
+            transition: color 0.15s, transform 0.15s;
+        }
+        .star-picker input:checked ~ label,
+        .star-picker label:hover,
+        .star-picker label:hover ~ label {
+            color: #f5c542; transform: scale(1.15);
+        }
+
+        .btn-kirim {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, var(--accent2), var(--accent));
+            color: #fff; border: none; border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; letter-spacing: 0.03em; margin-top: 6px;
+            box-shadow: 0 4px 24px rgba(139,111,255,0.28);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-kirim:hover { opacity: 0.87; transform: translateY(-1px); }
+
+        .form-success {
+            display: none;
+            text-align: center; padding: 28px 16px;
+        }
+        .success-icon { font-size: 2.6rem; margin-bottom: 12px; }
+        .form-success h4 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;
+        }
+        .form-success p { color: var(--sub); font-size: 0.87rem; }
+
+        @media (max-width: 820px) {
+            nav { padding: 0 24px; }
+            .nav-links { gap: 0; }
+            .nav-links li a { padding: 6px 8px; font-size: 0.78rem; }
+            .section-wrap { padding: 80px 24px; }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-sidebar { position: static; }
+            .service-card { grid-template-columns: 56px 1fr; }
+            .card-right { grid-column: 1 / -1; flex-direction: row; align-items: center; }
+            footer { flex-direction: column; gap: 12px; text-align: center; padding: 28px 24px; }
+            .hero-stats { gap: 28px; }
+            .masukan-wrap { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav id="navbar">
+    <a href="#home" class="logo">NEX<span>U</span>S</a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#services">Layanan</a></li>
+        <li><a href="#testimoni">Testimoni</a></li>
+        <li><a href="#about">Informasi</a></li>
+        <li><a href="#masukan">Masukan</a></li>
+    </ul>
+    <button class="btn-login" onclick="openAuthModal()">Masuk</button>
+</nav>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+        <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+        <div id="login-form">
+            <h2 class="modal-title">Masuk Akun</h2>
+            <form onsubmit="handleAuth(event,'login')">
+                <div class="input-group"><label>Email</label><input type="email" required placeholder="kamu@email.com"></div>
+                <div class="input-group"><label>Password</label><input type="password" required placeholder="••••••••"></div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+            <div class="toggle-form">Belum punya akun? <span onclick="toggleAuthMode()">Daftar di sini</span></div>
+        </div>
+        <div id="register-form">
+            <h2 class="modal-title">Buat Akun</h2>
+            <form onsubmit="handleAuth(event,'register')">
+                <div class="input-group"><label>Username</label><input type="text" required placeholder="Username in-game"></div>
+                <div class="input-group"><label>Email</label><input type="email" required placeholder="kamu@email.com"></div>
+                <div class="input-group"><label>Password</label><input type="password" required placeholder="Buat password kuat"></div>
+                <button type="submit" class="btn-submit">Daftar Sekarang</button>
+            </form>
+            <div class="toggle-form">Sudah punya akun? <span onclick="toggleAuthMode()">Login di sini</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ ORDER MODAL ══ -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal-box">
+        <span class="close-btn" onclick="closeOrderModal()">&times;</span>
+        <h2 class="modal-title">Form Pemesanan</h2>
+        <form id="orderForm" onsubmit="prosesPesanan(event)">
+            <div class="input-group"><label>Layanan</label><input type="text" id="order-produk" readonly></div>
+            <div class="input-group"><label>Harga (Rp)</label><input type="number" id="order-harga" readonly></div>
+            <div class="input-group"><label>Nama / Username</label><input type="text" id="order-nama" required placeholder="Masukkan nama kamu"></div>
+            <div class="input-group"><label>Email</label><input type="email" id="order-email" required placeholder="kamu@email.com"></div>
+            <div class="input-group"><label>WhatsApp</label><input type="tel" id="order-hp" required placeholder="08123456789"></div>
+            <button type="submit" id="btn-bayar" class="btn-submit">Lanjutkan Pembayaran</button>
+        </form>
+    </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<header id="home">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="hero-badge">Nexus Gaming Services</div>
+    <h1>Tingkatkan Pengalaman<br><em>Bermainmu</em></h1>
+    <p>Layanan game profesional — scripting, modding, dan leveling — dikerjakan dengan presisi dan dedikasi penuh.</p>
+
+    <div class="hero-cta">
+        <a href="#services" class="btn-primary">Lihat Layanan</a>
+        <a href="#about" class="btn-ghost">Informasi</a>
+    </div>
+
+    <div class="hero-stats">
+        <div class="stat"><div class="stat-num">50+</div><div class="stat-label">Klien Puas</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Layanan Aktif</div></div>
+        <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Garansi Aman</div></div>
+    </div>
+
+    <div class="scroll-hint">
+        <span>Scroll</span>
+        <div class="scroll-bar"></div>
+    </div>
+</header>
+
+<!-- ══ SERVICES ══ -->
+<div class="section-wrap" id="services">
+    <div class="eyebrow reveal">✦ Apa yang kami tawarkan</div>
+    <h2 class="section-title reveal reveal-delay-1">Layanan Kami</h2>
+
+    <div class="tab-bar reveal reveal-delay-2">
+        <button class="tab-btn active" onclick="switchTab('semua',this)">
+            <span class="tab-icon">⚡</span> Semua
+        </button>
+        <button class="tab-btn" onclick="switchTab('scripting',this)">
+            <span class="tab-icon">🤖</span> Scripting
+        </button>
+        <button class="tab-btn" onclick="switchTab('modding',this)">
+            <span class="tab-icon">🧩</span> Modding
+        </button>
+        <button class="tab-btn" onclick="switchTab('joki',this)">
+            <span class="tab-icon">⚔️</span> Joki
+        </button>
+    </div>
+
+    <!-- Tab: Semua -->
+    <div class="tab-panel active" id="tab-semua">
+        <div class="services-grid">
+            <div class="service-card" onclick="openOrderModal('Scripting & Bot Node.js',150000)">
+                <div class="card-icon">🤖</div>
+                <div class="card-body">
+                    <h3>Scripting & Bot</h3>
+                    <p>Pembuatan bot kustom (WhatsApp, Telegram) dan sistem automasi manajemen yang handal dan efisien.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 150.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+            <div class="service-card" onclick="openOrderModal('Modding & Addons',200000)">
+                <div class="card-icon">🧩</div>
+                <div class="card-body">
+                    <h3>Modding & Addons</h3>
+                    <p>Pengembangan mod dan addon in-game yang kompleks, termasuk sistem Command Block yang canggih.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 200.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+            <div class="service-card" onclick="openOrderModal('Jasa Joki & Leveling',100000)">
+                <div class="card-icon">⚔️</div>
+                <div class="card-body">
+                    <h3>Jasa Joki & Leveling</h3>
+                    <p>Penyelesaian misi, farming, dan push rank dengan cepat, aman, dan profesional.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 100.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Scripting -->
+    <div class="tab-panel" id="tab-scripting">
+        <div class="services-grid">
+            <div class="service-card" onclick="openOrderModal('Scripting & Bot Node.js',150000)">
+                <div class="card-icon">🤖</div>
+                <div class="card-body">
+                    <h3>Scripting & Bot</h3>
+                    <p>Pembuatan bot kustom (WhatsApp, Telegram, Discord) dan sistem automasi manajemen menggunakan Node.js untuk performa optimal dan stabil.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 150.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Modding -->
+    <div class="tab-panel" id="tab-modding">
+        <div class="services-grid">
+            <div class="service-card" onclick="openOrderModal('Modding & Addons',200000)">
+                <div class="card-icon">🧩</div>
+                <div class="card-body">
+                    <h3>Modding & Addons</h3>
+                    <p>Pengembangan mod dan addon in-game yang kompleks, termasuk sistem Command Block untuk Minecraft Bedrock. Termasuk BookOfPrograms project.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 200.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Joki -->
+    <div class="tab-panel" id="tab-joki">
+        <div class="services-grid">
+            <div class="service-card" onclick="openOrderModal('Jasa Joki & Leveling',100000)">
+                <div class="card-icon">⚔️</div>
+                <div class="card-body">
+                    <h3>Jasa Joki & Leveling</h3>
+                    <p>Penyelesaian misi, farming, dan push rank dengan cepat, aman, dan profesional. Akun kamu dijamin keamanannya selama proses berlangsung.</p>
+                </div>
+                <div class="card-right">
+                    <div class="card-price">Rp 100.000</div>
+                    <div class="card-order-btn">Pesan →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ TESTIMONI ══ -->
+<div class="section-wrap" id="testimoni">
+    <div class="eyebrow reveal">✦ Kata mereka</div>
+    <h2 class="section-title reveal reveal-delay-1">Testimoni Klien</h2>
+    <div class="testi-grid">
+
+        <div class="testi-card reveal reveal-delay-1">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">Bot WhatsApp-nya bekerja sangat lancar, fitur automasi reply-nya persis seperti yang saya minta. Proses pengerjaannya cepat dan komunikasinya responsif banget. Recommended!</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">🧑</div>
+                <div>
+                    <div class="testi-name">Rafi A.</div>
+                    <div class="testi-role">Owner UMKM Online</div>
+                </div>
+                <span class="testi-badge">Scripting</span>
+            </div>
+        </div>
+
+        <div class="testi-card reveal reveal-delay-2">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">Addon Minecraft-nya keren abis! Command block system-nya kompleks tapi tetap ringan. Klien server aku pada suka. Pasti bakal order lagi buat update fitur berikutnya.</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">👾</div>
+                <div>
+                    <div class="testi-name">Dzaky M.</div>
+                    <div class="testi-role">Minecraft Server Owner</div>
+                </div>
+                <span class="testi-badge">Modding</span>
+            </div>
+        </div>
+
+        <div class="testi-card reveal reveal-delay-3">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★☆</div>
+            <p class="testi-text">Joki rank-nya aman dan profesional, akun aku nggak kena banned sama sekali. Hasilnya juga sesuai target yang disepakatin. Worth it banget buat harganya.</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">🎮</div>
+                <div>
+                    <div class="testi-name">Nanda P.</div>
+                    <div class="testi-role">Mobile Gamer</div>
+                </div>
+                <span class="testi-badge">Joki</span>
+            </div>
+        </div>
+
+        <div class="testi-card reveal reveal-delay-1">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">Minta dibuatin sistem bot manajemen stok barang, hasilnya melebihi ekspektasi. Bisa handle multi-toko sekaligus. Pelayanannya ramah dan sabar njelasin ke orang awam kayak saya.</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">🛍️</div>
+                <div>
+                    <div class="testi-name">Sella R.</div>
+                    <div class="testi-role">Reseller Online</div>
+                </div>
+                <span class="testi-badge">Scripting</span>
+            </div>
+        </div>
+
+        <div class="testi-card reveal reveal-delay-2">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">Revisi-nya unlimited dan nggak pernah ribet. Setiap request perubahan langsung dikerjain. Ini developer yang beneran peduli sama kepuasan klien, bukan sekedar cari duit.</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">💻</div>
+                <div>
+                    <div class="testi-name">Hendra S.</div>
+                    <div class="testi-role">Startup Founder</div>
+                </div>
+                <span class="testi-badge">Scripting</span>
+            </div>
+        </div>
+
+        <div class="testi-card reveal reveal-delay-3">
+            <div class="testi-quote">"</div>
+            <div class="testi-stars">★★★★★</div>
+            <p class="testi-text">Dibuatin custom mod pack buat server RPG aku. Detail lore-nya dijaga dengan baik, event quest-nya berjalan mulus. Teman-teman server pada excited banget sama hasilnya!</p>
+            <div class="testi-footer">
+                <div class="testi-avatar">🗡️</div>
+                <div>
+                    <div class="testi-name">Fariz T.</div>
+                    <div class="testi-role">RPG Server Admin</div>
+                </div>
+                <span class="testi-badge">Modding</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ INFORMASI ══ -->
+<div class="section-wrap" id="about">
+    <div class="eyebrow reveal">✦ Siapa saya</div>
+    <h2 class="section-title reveal reveal-delay-1">Informasi</h2>
+    <div class="about-grid">
+        <div class="about-sidebar reveal">
+            <img src="logopan.png" alt="Logo Perusahaan">
+            <div class="skill-tags">
+                <span class="skill-tag">Programer</span>
+                <span class="skill-tag">wtiter</span>
+                <span class="skill-tag">desainer</span>
+                <span class="skill-tag">Modding</span>
+                <span class="skill-tag">Automasi</span>
+            </div>
+        </div>
+        <div class="about-body reveal reveal-delay-2">
+            <p>Halo! Saya adalah seorang developer dan antusias game yang berdomisili di Jabar. Sebagai seorang INFP, saya selalu mengutamakan pendekatan yang personal, empatik, dan berdedikasi tinggi terhadap setiap detail pesanan klien saya. Saya sangat menikmati warna abu-abu karena melambangkan ketenangan dan keseimbangan — prinsip yang saya bawa saat memecahkan masalah atau menulis kode.</p>
+            <p>Keahlian saya mencakup pengembangan web (HTML, CSS, JS), Python, dan pembuatan sistem terautomasi. Saat ini, saya juga sedang aktif mengembangkan <em>BookOfPrograms</em>, sebuah addon Minecraft Bedrock yang dirancang secara khusus untuk mengajarkan fungsionalitas <em>command block</em> melalui UI yang interaktif.</p>
+            <p>Di luar layar komputer, jika saya sedang berjalan-jalan dan bertemu kucing — entah itu kucing liar atau peliharaan — saya pasti akan berhenti sejenak untuk mengelusnya. Keseimbangan antara teknologi dan dunia nyata adalah kunci kreativitas saya! 🐱</p>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ MASUKAN ══ -->
+<div class="section-wrap" id="masukan">
+    <div class="eyebrow reveal">✦ Hubungi kami</div>
+    <h2 class="section-title reveal reveal-delay-1">Pesan & Masukan</h2>
+    <div class="masukan-wrap">
+
+        <div class="masukan-info reveal">
+            <h3>Ada pertanyaan atau saran untuk kami?</h3>
+            <p>Kami selalu terbuka untuk masukan, kritik, maupun pertanyaan seputar layanan. Isi form di samping dan kami akan membalas sesegera mungkin — biasanya dalam 1×24 jam.</p>
+            <div class="contact-items">
+                <div class="contact-item">
+                    <div class="contact-icon">💬</div>
+                    <span>WhatsApp: <strong style="color:var(--text)">+62 812-xxxx-xxxx</strong></span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">📧</div>
+                    <span>Email: <strong style="color:var(--text)">nexus@gaming.id</strong></span>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">🕐</div>
+                    <span>Respons dalam <strong style="color:var(--text)">1×24 jam</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="masukan-form-box reveal reveal-delay-2">
+            <div id="masukan-form-inner">
+                <form onsubmit="kirimMasukan(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nama</label>
+                            <input type="text" required placeholder="Nama kamu">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" required placeholder="kamu@email.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Topik</label>
+                        <select required>
+                            <option value="" disabled selected>Pilih topik...</option>
+                            <option>Pertanyaan Layanan</option>
+                            <option>Saran & Masukan</option>
+                            <option>Komplain</option>
+                            <option>Kerjasama</option>
+                            <option>Lainnya</option>
+                        </select>
+                    </div>
+                    <div class="rating-group">
+                        <label>Rating Pengalaman (opsional)</label>
+                        <div class="star-picker">
+                            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
+                            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+                            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+                            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+                            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Pesan</label>
+                        <textarea required placeholder="Tulis pesan, pertanyaan, atau masukan kamu di sini..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-kirim">Kirim Pesan ✦</button>
+                </form>
+            </div>
+            <div class="form-success" id="masukan-success">
+                <div class="success-icon">✅</div>
+                <h4>Pesan Terkirim!</h4>
+                <p>Terima kasih sudah menghubungi kami.<br>Kami akan membalas dalam 1×24 jam.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+    <div class="footer-logo">NEX<span>U</span>S</div>
+    <p>&copy; 2026 Nexus Gaming Services. Dibuat dengan presisi dan dedikasi.</p>
+</footer>
+
+<script>
+    /* ── Navbar scroll shadow ── */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+        updateActiveNav();
+    });
+
+    /* ── Active nav link on scroll ── */
+    function updateActiveNav() {
+        const sections = ['home','services','testimoni','about','masukan'];
+        const links    = document.querySelectorAll('.nav-links a');
+        let current    = 'home';
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && window.scrollY >= el.offsetTop - 130) current = id;
+        });
+        links.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    }
+
+    /* ── Smooth scroll ── */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            e.preventDefault();
+            const t = document.querySelector(a.getAttribute('href'));
+            if (t) t.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    /* ── Scroll reveal ── */
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ── Tab switching ── */
+    function switchTab(id, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    /* ── Auth Modal ── */
+    const authModal    = document.getElementById('authModal');
+    const loginForm    = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    function openAuthModal()  { authModal.classList.add('show'); }
+    function closeAuthModal() {
+        authModal.classList.remove('show');
+        loginForm.style.display    = 'block';
+        registerForm.style.display = 'none';
+    }
+    function toggleAuthMode() {
+        const showLogin = loginForm.style.display !== 'none';
+        loginForm.style.display    = showLogin ? 'none'  : 'block';
+        registerForm.style.display = showLogin ? 'block' : 'none';
+    }
+    function handleAuth(event, type) {
+        event.preventDefault();
+        alert(type === 'login' ? "Simulasi: Berhasil Login!" : "Simulasi: Akun berhasil dibuat!");
+        closeAuthModal();
+        event.target.reset();
+    }
+
+    /* ── Order Modal ── */
+    const orderModal = document.getElementById('orderModal');
+    function openOrderModal(nama, harga) {
+        document.getElementById('order-produk').value = nama;
+        document.getElementById('order-harga').value  = harga;
+        orderModal.classList.add('show');
+    }
+    function closeOrderModal() { orderModal.classList.remove('show'); }
+
+    window.onclick = e => {
+        if (e.target === authModal)  closeAuthModal();
+        if (e.target === orderModal) closeOrderModal();
+    };
+
+    /* ── Masukan Form ── */
+    function kirimMasukan(event) {
+        event.preventDefault();
+        document.getElementById('masukan-form-inner').style.display = 'none';
+        const success = document.getElementById('masukan-success');
+        success.style.display = 'block';
+        success.style.animation = 'panelIn 0.4s cubic-bezier(0.16,1,0.3,1) both';
+    }
+    /* ── END ── */
+    async function prosesPesanan(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btn-bayar');
+        btn.innerText = "Memproses..."; btn.disabled = true;
+
+        const payload = {
+            order_id:     "NEXUS-" + Math.floor(Math.random() * 1e9),
+            nama:         document.getElementById('order-nama').value,
+            email:        document.getElementById('order-email').value,
+            no_hp:        document.getElementById('order-hp').value,
+            produk:       document.getElementById('order-produk').value,
+            jumlah_bayar: document.getElementById('order-harga').value
+        };
+
+        try {
+            const res  = await fetch('http://127.0.0.1:5000/create-transaction', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (data.status === 'ok' && data.snap_token) {
+                window.snap.pay(data.snap_token, {
+                    onSuccess: () => { alert("Pembayaran berhasil! Struk telah dikirim ke Email & WA kamu."); closeOrderModal(); document.getElementById('orderForm').reset(); },
+                    onPending: () => { alert("Menunggu pembayaran..."); closeOrderModal(); },
+                    onError:   () => { alert("Pembayaran gagal. Silakan coba lagi."); },
+                    onClose:   () => { alert("Kamu menutup jendela pembayaran."); }
+                });
+            } else { alert("Gagal membuat transaksi. Kesalahan dari server."); }
+        } catch { alert("Kesalahan jaringan. Pastikan backend Flask menyala."); }
+        finally { btn.innerText = "Lanjutkan Pembayaran"; btn.disabled = false; }
+    }
+</script>
+</body>
+</html>
